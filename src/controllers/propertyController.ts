@@ -54,7 +54,7 @@ class propertyController {
       });
     }
 
-    const { count, data: dbData } = await supabase
+    const { data: dbData } = await supabase
       .from("property_data")
       .insert([
         {
@@ -76,7 +76,7 @@ class propertyController {
 
     res.json({
       success: true,
-      message: `Created ${count} properties`,
+      message: "Created new properties.",
       data: dbData,
     });
   }

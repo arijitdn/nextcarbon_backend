@@ -6,9 +6,8 @@ const propertyRouter = Router();
 propertyRouter
   .route("/")
   .get(propertyController.get)
-  .post(propertyController.post)
-  .patch()
-  .delete();
+  .post(propertyController.post);
+
 propertyRouter.route("/:propertyId").get(propertyController.getById);
 
 export default propertyRouter;
