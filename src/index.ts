@@ -1,14 +1,15 @@
 import express from "express";
 import { config } from "dotenv";
 import orderRouter from "./routes/order.routes";
+import propertyRouter from "./routes/property.routes";
+import { CONFIG } from "./lib/config";
 
 config();
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({
     message: "Hello from Nextcarbon!",
   });
@@ -16,7 +17,8 @@ app.get("/", (req, res) => {
 
 // Load Routes
 app.use("/api/orders", orderRouter);
+app.use("/api/property", propertyRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server running on PORT: ${PORT}`);
+app.listen(CONFIG.port, () => {
+  console.log(`Server online: http://localhost:${CONFIG.port}`);
 });
