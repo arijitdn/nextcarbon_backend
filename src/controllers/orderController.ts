@@ -1,10 +1,10 @@
 import crypto from "crypto";
 import { v4 as uuid } from "uuid";
 import { Request, Response } from "express";
-import { orderCreateSchema, orderVerifySchema } from "../lib/zodSchemas";
-import OrderOptions from "../types/orderOptions";
 import razorpay from "../lib/razorpay";
 import db from "../lib/db";
+import orderCreateSchema from "../schemas/orderCreate.schema";
+import orderVerifySchema from "../schemas/orderVerify.schema";
 
 class orderController {
   async getOrder(req: Request, res: Response) {
@@ -45,14 +45,14 @@ class orderController {
 
     const orderReceipt = `receipt_${uuid()}_${Date.now()}`;
 
-    const orderOptions: OrderOptions = {
+    const orderOptions = {
       amount: data.amount.toString(),
       currency: data.currency ?? "INR",
       receipt: orderReceipt,
     };
 
     try {
-      const order = await razorpay.orders.create(orderOptions);
+      const order = razorpay.orders.create(orderOptions);
 
       if (order) {
         await db.order.create({

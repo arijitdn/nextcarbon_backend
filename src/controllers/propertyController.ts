@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { supabase } from "../lib/supabase";
-import { propertyCreateSchema } from "../lib/zodSchemas";
+import propertyCreateSchema from "../schemas/propertyCreate.schema";
 
 class propertyController {
   async get(_req: Request, res: Response) {
