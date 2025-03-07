@@ -6,7 +6,8 @@ const propertyRouter = Router();
 propertyRouter
   .route("/")
   .get(propertyController.getAllProperties)
-  .post(propertyController.createProperty);
+  .post(propertyController.createProperty)
+  .delete(propertyController.deleteProperty);
 
 propertyRouter.route("/:propertyId").get(propertyController.getPropetyById);
 

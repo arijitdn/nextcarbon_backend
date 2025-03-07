@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
 import { supabase } from "../lib/supabase";
-import propertyCreateSchema from "../schemas/propertyCreate.schema";
+import {
+  deletePropertySchema,
+  propertyCreateSchema,
+} from "../schemas/property.schema";
 
 class PropertyController {
   async getAllProperties(_req: Request, res: Response) {
@@ -86,6 +89,39 @@ class PropertyController {
     res.json({
       success: true,
       message: "Created new properties.",
+      data: dbData,
+    });
+  }
+
+  async deleteProperty(req: Request, res: Response) {
+    const { success, data, error } = deletePropertySchema.safeParse(req.body);
+
+    if (!success) {
+      res.json({
+        success: false,
+        error,
+      });
+
+      return;
+    }
+
+    const { data: dbData, error: dbError } = await supabase
+      .from("property_data")
+      .delete()
+      .eq("id", data.id)
+      .select();
+
+    if (!data) {
+      res.json({
+        success: false,
+        error: dbError,
+      });
+
+      return;
+    }
+
+    res.json({
+      success: true,
       data: dbData,
     });
   }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const propertyCreateSchema = z.object({
+export const propertyCreateSchema = z.object({
   name: z.string(),
   status: z.enum(["launchpad", "trading"]),
   price: z.number(),
@@ -22,4 +22,6 @@ const propertyCreateSchema = z.object({
   description: z.string(),
 });
 
-export default propertyCreateSchema;
+export const deletePropertySchema = z.object({
+  id: z.string(),
+});
