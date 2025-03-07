@@ -1,10 +1,8 @@
 import express from "express";
-import { config } from "dotenv";
+import { CONFIG } from "./lib/config";
 import orderRouter from "./routes/order.routes";
 import propertyRouter from "./routes/property.routes";
-import { CONFIG } from "./lib/config";
 
-config();
 const app = express();
 
 app.use(express.json());
