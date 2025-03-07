@@ -1,13 +1,13 @@
 import { Router } from "express";
-import propertyController from "../controllers/propertyController";
+import propertyController from "../controllers/property.controller";
 
 const propertyRouter = Router();
 
 propertyRouter
   .route("/")
-  .get(propertyController.get)
-  .post(propertyController.post);
+  .get(propertyController.getAllProperties)
+  .post(propertyController.createProperty);
 
-propertyRouter.route("/:propertyId").get(propertyController.getById);
+propertyRouter.route("/:propertyId").get(propertyController.getPropetyById);
 
 export default propertyRouter;

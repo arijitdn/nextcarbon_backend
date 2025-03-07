@@ -6,8 +6,8 @@ import db from "../lib/db";
 import orderCreateSchema from "../schemas/orderCreate.schema";
 import orderVerifySchema from "../schemas/orderVerify.schema";
 
-class orderController {
-  async getOrder(req: Request, res: Response) {
+class OrderController {
+  async getOrderById(req: Request, res: Response) {
     const orderId = req.params.orderId;
 
     if (!orderId) {
@@ -31,7 +31,7 @@ class orderController {
     });
   }
 
-  async create(req: Request, res: Response) {
+  async createOrder(req: Request, res: Response) {
     const { success, data, error } = orderCreateSchema.safeParse(req.body());
     if (!success) {
       res.status(400).json({
@@ -87,7 +87,7 @@ class orderController {
     }
   }
 
-  async verify(req: Request, res: Response) {
+  async verifyOrder(req: Request, res: Response) {
     const { data, success, error } = orderVerifySchema.safeParse(req.body());
 
     if (!success) {
@@ -119,4 +119,4 @@ class orderController {
   }
 }
 
-export default new orderController();
+export default new OrderController();

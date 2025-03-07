@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 import propertyCreateSchema from "../schemas/propertyCreate.schema";
 
 class propertyController {
-  async get(_req: Request, res: Response) {
+  async getAllProperties(_req: Request, res: Response) {
     const { data, error } = await supabase.from("property_data").select("*");
 
     if (!data) {
@@ -21,7 +21,7 @@ class propertyController {
     });
   }
 
-  async getById(req: Request, res: Response) {
+  async getPropetyById(req: Request, res: Response) {
     const propertyId = req.params.propertyId;
 
     const { data, error } = await supabase
@@ -44,7 +44,7 @@ class propertyController {
     });
   }
 
-  async post(req: Request, res: Response) {
+  async createProperty(req: Request, res: Response) {
     const { success, data, error } = propertyCreateSchema.safeParse(req.body);
 
     if (!success) {
