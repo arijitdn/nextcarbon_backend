@@ -32,7 +32,7 @@ class OrderController {
   }
 
   async createOrder(req: Request, res: Response) {
-    const { success, data, error } = orderCreateSchema.safeParse(req.body());
+    const { success, data, error } = orderCreateSchema.safeParse(req.body);
     if (!success) {
       res.status(400).json({
         success: false,
@@ -43,7 +43,7 @@ class OrderController {
       return;
     }
 
-    const orderReceipt = `receipt_${uuid()}_${Date.now()}`;
+    const orderReceipt = `rcpt_${Date.now()}`;
 
     const orderOptions = {
       amount: data.amount.toString(),
@@ -52,19 +52,9 @@ class OrderController {
     };
 
     try {
-      const order = razorpay.orders.create(orderOptions);
+      const order = await razorpay.orders.create(orderOptions);
 
       if (order) {
-        await db.order.create({
-          data: {
-            amount: data.amount.toString(),
-            currency: data.currency ?? "INR",
-            orderId: (order as any).orderId,
-            orderStatus: (order as any).status,
-            receipt: orderReceipt,
-          },
-        });
-
         res.status(200).json({
           success: true,
           message: "Order created successfully",
@@ -88,7 +78,7 @@ class OrderController {
   }
 
   async verifyOrder(req: Request, res: Response) {
-    const { data, success, error } = orderVerifySchema.safeParse(req.body());
+    const { data, success, error } = orderVerifySchema.safeParse(req.body);
 
     if (!success) {
       res.status(400).json({
