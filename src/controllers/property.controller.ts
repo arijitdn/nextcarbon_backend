@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { supabase } from "../lib/supabase";
 import propertyCreateSchema from "../schemas/propertyCreate.schema";
 
-class propertyController {
+class PropertyController {
   async getAllProperties(_req: Request, res: Response) {
     const { data, error } = await supabase.from("property_data").select("*");
 
@@ -82,4 +82,4 @@ class propertyController {
   }
 }
 
-export default new propertyController();
+export default new PropertyController();
