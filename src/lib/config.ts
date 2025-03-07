@@ -7,5 +7,5 @@ export const CONFIG = {
   razorpayKeyId: process.env.RAZORPAY_KEY_ID ?? "",
   razorpaySecret: process.env.RAZORPAY_SECRET ?? "",
   supabaseUri: process.env.SUPABASE_URI ?? "",
-  supabaseAnonKey: process.env.SUPABASE_ANON ?? "",
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
 };
