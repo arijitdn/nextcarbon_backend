@@ -52,6 +52,8 @@ class PropertyController {
         success: false,
         error,
       });
+
+      return;
     }
 
     const { data: dbData } = await supabase
