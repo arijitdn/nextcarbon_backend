@@ -38,6 +38,13 @@ class PropertyController {
       return;
     }
 
+    if (data.length <= 0) {
+      res.json({
+        success: false,
+        error: "No property found with that id",
+      });
+    }
+
     res.json({
       success: true,
       data,
