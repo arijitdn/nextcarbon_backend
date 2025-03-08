@@ -1,10 +1,10 @@
 import crypto from "crypto";
-import { v4 as uuid } from "uuid";
 import { Request, Response } from "express";
 import razorpay from "../lib/razorpay";
 import db from "../lib/db";
 import orderCreateSchema from "../schemas/orderCreate.schema";
 import orderVerifySchema from "../schemas/orderVerify.schema";
+import { supabase } from "../lib/supabase";
 
 class OrderController {
   async getOrderById(req: Request, res: Response) {
@@ -43,27 +43,61 @@ class OrderController {
       return;
     }
 
-    const orderReceipt = `rcpt_${Date.now()}`;
-
-    const orderOptions = {
-      amount: data.amount.toString(),
-      currency: data.currency ?? "INR",
-      receipt: orderReceipt,
-    };
+    const orderReceipt = `rcpt_${crypto
+      .randomBytes(3)
+      .toString("hex")}_${Date.now()}`;
 
     try {
-      const order = await razorpay.orders.create(orderOptions);
+      const { data: propertyData } = await supabase
+        .from("property_data")
+        .select("*")
+        .eq("id", data.propertyId);
 
-      if (order) {
+      if (!propertyData) {
+        res.status(400).json({
+          success: false,
+          error: "Property could not be found",
+        });
+
+        return;
+      }
+
+      const order = await razorpay.orders.create({
+        amount: propertyData[0].price * data.shares * 100,
+        currency: data.currency ?? "INR",
+        receipt: orderReceipt,
+      });
+
+      const { data: dbData, error: dbError } = await supabase
+        .from("payments")
+        .insert([
+          {
+            user_id: data.userId,
+            property_id: data.propertyId,
+            amount: Number(order.amount) / 100,
+            currency: order.currency,
+            order_id: order.id,
+            receipt_id: order.receipt,
+            offer_id: order.offer_id,
+            status: "created",
+            shares: data.shares,
+          },
+        ])
+        .select();
+
+      if (order && dbData) {
         res.status(200).json({
           success: true,
           message: "Order created successfully",
           data: order,
         });
       } else {
+        console.log(dbError);
+        console.log(error);
+
         res.status(400).json({
           success: false,
-          message: "Failed to create the order",
+          error: "Failed to create the order",
         });
 
         return;
@@ -72,7 +106,7 @@ class OrderController {
       console.log("Failed to create order:", error);
       res.status(500).json({
         success: false,
-        message: "Internal server error",
+        error: "Internal server error",
       });
     }
   }
@@ -96,11 +130,29 @@ class OrderController {
       .digest("hex");
 
     if (data.razorpaySignature === expectedSignature) {
+      await supabase
+        .from("payments")
+        .update({
+          status: "success",
+        })
+        .eq("order_id", data.orderId);
+
+      // property data -> inventory
+      // take no of shares from users
+      // check for available shares
+
       res.status(200).json({
         success: true,
         message: "Payment successfully verified",
       });
     } else {
+      await supabase
+        .from("payments")
+        .update({
+          status: "failed",
+        })
+        .eq("order_id", data.orderId);
+
       res.status(400).json({
         success: false,
         message: "Payment is not verified",
