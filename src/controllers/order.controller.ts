@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import { Request, Response } from "express";
 import razorpay from "../lib/razorpay";
-import db from "../lib/db";
 import orderCreateSchema from "../schemas/orderCreate.schema";
 import orderVerifySchema from "../schemas/orderVerify.schema";
 import { supabase } from "../lib/supabase";
@@ -19,15 +18,9 @@ class OrderController {
       return;
     }
 
-    const orderDetails = await db.order.findFirst({
-      where: {
-        orderId,
-      },
-    });
-
+    // To be implemented
     res.status(200).json({
       success: true,
-      data: orderDetails,
     });
   }
 
