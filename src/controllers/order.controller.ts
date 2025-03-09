@@ -46,10 +46,19 @@ class OrderController {
         .select("*")
         .eq("id", data.propertyId);
 
-      if (!propertyData) {
+      if (!propertyData || propertyData.length <= 0) {
         res.status(400).json({
           success: false,
           error: "Property could not be found",
+        });
+
+        return;
+      }
+
+      if (propertyData[0].available_shares < data.shares) {
+        res.status(400).json({
+          success: false,
+          error: `Invalid request: Only ${propertyData[0].available_shares} shares are available. You can't place an order for ${data.shares} shares.`,
         });
 
         return;
@@ -130,13 +139,49 @@ class OrderController {
         })
         .eq("order_id", data.orderId);
 
-      // property data -> inventory
-      // take no of shares from users
-      // check for available shares
+      const { data: propertyData } = await supabase
+        .from("property_data")
+        .select("*")
+        .eq("id", data.propertyId);
+
+      if (!propertyData || propertyData.length <= 0) {
+        res.status(400).json({
+          success: false,
+          error: "Invalid property id provided",
+        });
+
+        return;
+      }
+
+      if (propertyData[0].available_shares < data.shares) {
+        res.status(400).json({
+          success: false,
+          error: `Payment was successfull but ${data.shares} shares are not left. Maybe someone already bought it.`,
+        });
+
+        // TODO: Issue a refund
+
+        return;
+      }
+
+      await supabase
+        .from("property_data")
+        .update({
+          available_shares: propertyData[0].available_shares - data.shares,
+        })
+        .eq("id", data.propertyId);
+
+      await supabase.from("owners").insert([
+        {
+          user_id: data.userId,
+          property_id: data.propertyId,
+          credits: data.shares,
+        },
+      ]);
 
       res.status(200).json({
         success: true,
-        message: "Payment successfully verified",
+        message: `Payment successfull, ${data.shares} bought successfully`,
       });
     } else {
       await supabase
